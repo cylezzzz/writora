@@ -100,15 +100,11 @@ Antworte immer auf Deutsch und halte deine Antworten prägnant aber hilfreich.
       messages: [
         {
           role: "system",
-          content: systemPrompt
+          content: systemPrompt.trim(),
         },
-        ...(context ? [{
-          role: "assistant",
-          content: `Kontext: ${context}`
-        }] : []),
         {
           role: "user",
-          content: message
+          content: context ? `${context}\n\n${message}` : message,
         }
       ],
       temperature: 0.7,
