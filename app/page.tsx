@@ -4,7 +4,17 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Sparkles, Zap, Download, Users, Shield, ArrowRight, Check, Star } from 'lucide-react';
+import {
+  BookOpen,
+  Sparkles,
+  Zap,
+  Download,
+  Users,
+  Shield,
+  ArrowRight,
+  Check,
+  Star,
+} from 'lucide-react';
 import Link from 'next/link';
 
 export default function Page() {
@@ -18,35 +28,38 @@ export default function Page() {
     { icon: '🧒', name: 'Malbuch', desc: 'KI-Ausmalbilder' },
     { icon: '🧑‍🏫', name: 'Fachbuch', desc: 'Wissenschaftlich, Gliederung' },
     { icon: '✍️', name: 'Tagebuch', desc: 'Interaktiv, Fragen, Übungen' },
-    { icon: '🧚', name: 'Märchen', desc: 'Klassisch mit Moral' }
+    { icon: '🧚', name: 'Märchen', desc: 'Klassisch mit Moral' },
   ];
 
   const features = [
     {
       icon: <Sparkles className="h-8 w-8 text-blue-500" />,
       title: 'KI-gestützte Erstellung',
-      description: 'Erstelle komplette Bücher durch natürliche Unterhaltung mit fortschrittlicher KI'
+      description:
+        'Erstelle komplette Bücher durch natürliche Unterhaltung mit fortschrittlicher KI',
     },
     {
       icon: <BookOpen className="h-8 w-8 text-green-500" />,
       title: 'Live-Vorschau',
-      description: 'Sieh dein Buch in Echtzeit entstehen mit interaktiver Seitenvorschau'
+      description: 'Sieh dein Buch in Echtzeit entstehen mit interaktiver Seitenvorschau',
     },
     {
       icon: <Download className="h-8 w-8 text-purple-500" />,
       title: 'KDP-Ready Export',
-      description: 'Exportiere direkt für Amazon KDP mit automatischem Cover und Metadaten'
+      description: 'Exportiere direkt für Amazon KDP mit automatischem Cover und Metadaten',
     },
     {
       icon: <Zap className="h-8 w-8 text-orange-500" />,
       title: 'Schnelle Bearbeitung',
-      description: 'Ändere jede Seite durch einfache Chat-Befehle in Sekunden'
-    }
+      description: 'Ändere jede Seite durch einfache Chat-Befehle in Sekunden',
+    },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* ALLES WEITERE KOMMT HIER HINEIN – GANZ WIE DU ES SCHON GEMACHT HAST */}
+      {/* Dein gesamtes JSX bleibt hier erhalten */}
+      {/* Die Sektionen: Header, Hero, Features, Buchtypen, Preise, CTA, Footer */}
+      {/* Du kannst direkt mit deinem bestehenden JSX fortfahren */}
     </div>
   );
 }
