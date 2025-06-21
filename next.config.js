@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
-  eslint: {
-    ignoreDuringBuilds: true,
+  experimental: {
+    appDir: true, // für app/ Routing
   },
-  images: { unoptimized: true },
+  reactStrictMode: true,
 };
 
 module.exports = nextConfig;
