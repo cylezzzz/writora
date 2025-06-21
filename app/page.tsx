@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, Sparkles, Zap, Download, Users, Shield, ArrowRight, Check, Star } from 'lucide-react';
 import Link from 'next/link';
 
-export default function HomePage() {
+const Page = () => {
   const [isYearly, setIsYearly] = useState(false);
 
   const bookTypes = [
@@ -43,6 +43,13 @@ export default function HomePage() {
       description: 'Ändere jede Seite durch einfache Chat-Befehle in Sekunden'
     }
   ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+      {/* dein kompletter JSX-Inhalt */}
+    </div>
+  );
+};
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
