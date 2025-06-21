@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { BookOpen, Sparkles, Zap, Download, Users, Shield, ArrowRight, Check, Star } from 'lucide-react';
 import Link from 'next/link';
 
-const Page = () => {
+export default function Page() {
   const [isYearly, setIsYearly] = useState(false);
 
   const bookTypes = [
@@ -46,10 +46,10 @@ const Page = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* dein kompletter JSX-Inhalt */}
+      {/* ALLES WEITERE KOMMT HIER HINEIN – GANZ WIE DU ES SCHON GEMACHT HAST */}
     </div>
   );
-};
+}
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
@@ -437,4 +437,3 @@ const Page = () => {
     </div>
   );
 }
-export default Page;
