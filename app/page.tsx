@@ -57,9 +57,7 @@ export default function Page() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Dein gesamtes JSX bleibt hier erhalten */}
-      {/* Die Sektionen: Header, Hero, Features, Buchtypen, Preise, CTA, Footer */}
-      {/* Du kannst direkt mit deinem bestehenden JSX fortfahren */}
+      {/* Dein gesamter JSX kommt hier rein – bereits vorhanden in deinem ursprünglichen Code */}
     </div>
   );
 }
