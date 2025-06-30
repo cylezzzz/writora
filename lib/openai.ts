@@ -9,63 +9,83 @@ export interface BookGenerationRequest {
   style: string;
   theme: string;
   targetAudience: string;
+  pageCount?: number;
   additionalNotes?: string;
 }
 
 export interface BookStructure {
   title: string;
-  chapters: {
+  subtitle?: string;
+  description: string;
+  genre: string;
+  pages: Array<{
     number: number;
     title: string;
     content: string;
     wordCount: number;
-  }[];
+    summary?: string;
+  }>;
   totalWordCount: number;
+  estimatedReadingTime: string;
+  keywords: string[];
+  coverPrompt?: string;
 }
 
 export async function generateBookStructure(request: BookGenerationRequest): Promise<BookStructure> {
-  const prompt = `
-Du bist ein professioneller Buchautor und hilfst dabei, ein ${request.genre} zu erstellen.
+  const pageCount = request.pageCount || 8;
+  
+  const prompt = `Du bist ein professioneller Buchautor mit jahrelanger Erfahrung im ${request.genre}-Genre.
 
-Details:
+AUFTRAG: Erstelle ein vollständiges ${request.genre} mit folgenden Vorgaben:
 - Genre: ${request.genre}
 - Stil: ${request.style}
 - Thema: ${request.theme}
 - Zielgruppe: ${request.targetAudience}
-${request.additionalNotes ? `- Zusätzliche Notizen: ${request.additionalNotes}` : ''}
+- Seitenanzahl: ${pageCount}
+${request.additionalNotes ? `- Besondere Wünsche: ${request.additionalNotes}` : ''}
 
-Erstelle eine Buchstruktur mit 6-8 Kapiteln. Jedes Kapitel sollte etwa 200-300 Wörter haben.
+QUALITÄTSANFORDERUNGEN:
+- Jede Seite sollte 300-500 Wörter haben
+- Verwende lebendige, ansprechende Sprache
+- Schaffe emotionale Verbindungen zu den Lesern
+- Achte auf logischen Aufbau und Spannungsbogen
 
 Antworte im folgenden JSON-Format:
 {
-  "title": "Buchtitel",
-  "chapters": [
+  "title": "Einprägsamer Buchtitel",
+  "subtitle": "Optionaler Untertitel",
+  "description": "2-3 Sätze Buchbeschreibung",
+  "genre": "${request.genre}",
+  "pages": [
     {
       "number": 1,
-      "title": "Kapiteltitel",
-      "content": "Kapitelinhalt...",
-      "wordCount": 250
+      "title": "Kapitel-/Seitentitel",
+      "content": "Vollständiger Seiteninhalt mit mindestens 300 Wörtern...",
+      "wordCount": 350,
+      "summary": "Kurze Zusammenfassung dieser Seite"
     }
   ],
-  "totalWordCount": 1500
-}
-`;
+  "totalWordCount": ${pageCount * 350},
+  "estimatedReadingTime": "${Math.ceil((pageCount * 350) / 200)} Minuten",
+  "keywords": ["keyword1", "keyword2", "keyword3"],
+  "coverPrompt": "Beschreibung für KI-Cover-Generierung"
+}`;
 
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4",
+      model: "gpt-4-turbo",
       messages: [
         {
           role: "system",
-          content: "Du bist ein professioneller Buchautor, der dabei hilft, hochwertige Bücher zu erstellen. Antworte immer auf Deutsch und im angegebenen JSON-Format."
+          content: "Du bist ein professioneller Buchautor. Antworte IMMER auf Deutsch und im exakten JSON-Format. Erstelle vollständige, qualitativ hochwertige Inhalte."
         },
         {
           role: "user",
           content: prompt
         }
       ],
-      temperature: 0.7,
-      max_tokens: 3000
+      temperature: 0.8,
+      max_tokens: 4000
     });
 
     const response = completion.choices[0]?.message?.content;
@@ -73,47 +93,37 @@ Antworte im folgenden JSON-Format:
       throw new Error('Keine Antwort von OpenAI erhalten');
     }
 
-    return JSON.parse(response);
+    // Clean and parse JSON
+    const cleanResponse = response.replace(/```json\n?/g, '').replace(/```\n?/g, '');
+    return JSON.parse(cleanResponse);
+    
   } catch (error) {
-    console.error('Fehler bei der Buchgenerierung:', error);
+    console.error('OpenAI API Error:', error);
     throw new Error('Fehler bei der Buchgenerierung');
   }
 }
 
-export async function generateChatResponse(message: string, context?: string): Promise<string> {
-  const systemPrompt = `
-Du bist der KI-Assistent von Writora, einer Plattform für KI-gestützte Bucherstellung.
-
-Deine Aufgaben:
-- Hilf Nutzern beim Erstellen von Büchern durch natürliche Unterhaltung
-- Stelle gezielte Fragen, um die Buchidee zu entwickeln
-- Gib konkrete Vorschläge für Verbesserungen
-- Erkläre, wie Nutzer ihre Bücher bearbeiten können
-- Sei freundlich, professionell und hilfreich
-
-Antworte immer auf Deutsch und halte deine Antworten prägnant aber hilfreich.
-`;
-
+export async function generateChatResponse(message: string, context?: any): Promise<string> {
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-4",
       messages: [
         {
           role: "system",
-          content: systemPrompt.trim(),
+          content: "Du bist der freundliche KI-Assistent von Writora. Hilf Nutzern beim Erstellen von Büchern. Antworte auf Deutsch, prägnant und hilfreich."
         },
         {
           role: "user",
-          content: context ? `${context}\n\n${message}` : message,
+          content: context ? `${JSON.stringify(context)}\n\n${message}` : message
         }
       ],
       temperature: 0.7,
-      max_tokens: 500
+      max_tokens: 300
     });
 
     return completion.choices[0]?.message?.content || 'Entschuldigung, ich konnte keine Antwort generieren.';
   } catch (error) {
-    console.error('Fehler bei der Chat-Antwort:', error);
-    return 'Entschuldigung, es gab einen Fehler bei der Verarbeitung deiner Anfrage.';
+    console.error('Chat API Error:', error);
+    return 'Es gab einen technischen Fehler. Bitte versuche es erneut. 🔄';
   }
 }

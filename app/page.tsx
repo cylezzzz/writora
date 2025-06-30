@@ -1,443 +1,449 @@
+// Hybrid Onboarding Strategy für Writora
+
+// 1. CUSTOM ONBOARDING FLOW (Erste Experience)
+// components/onboarding/OnboardingFlow.tsx
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import {
-  BookOpen,
-  Sparkles,
-  Zap,
-  Download,
-  Users,
-  Shield,
-  ArrowRight,
-  Check,
-  Star,
-} from 'lucide-react';
-import Link from 'next/link';
+import { Progress } from '@/components/ui/progress';
+import { Sparkles, ArrowRight, BookOpen, Target } from 'lucide-react';
 
-export default function Page() {
-  const [isYearly, setIsYearly] = useState(false);
+interface OnboardingStep {
+  id: string;
+  title: string;
+  description: string;
+  component: React.ReactNode;
+}
 
-  const bookTypes = [
-    { icon: '📖', name: 'Roman', desc: 'Liebesroman, Thriller, Sci-Fi, Fantasy' },
-    { icon: '🕵️', name: 'Krimi', desc: 'Ermittlungen, Täterprofile, Spannung' },
-    { icon: '📘', name: 'Sachbuch', desc: 'Ratgeber, Wissen, Tutorials' },
-    { icon: '👶', name: 'Kinderbuch', desc: 'Einfache Sprache, Illustrationen' },
-    { icon: '🧒', name: 'Malbuch', desc: 'KI-Ausmalbilder' },
-    { icon: '🧑‍🏫', name: 'Fachbuch', desc: 'Wissenschaftlich, Gliederung' },
-    { icon: '✍️', name: 'Tagebuch', desc: 'Interaktiv, Fragen, Übungen' },
-    { icon: '🧚', name: 'Märchen', desc: 'Klassisch mit Moral' },
+export default function OnboardingFlow() {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [userData, setUserData] = useState({
+    bookIdea: '',
+    genre: '',
+    targetAudience: '',
+    experience: ''
+  });
+
+  const steps: OnboardingStep[] = [
+    {
+      id: 'welcome',
+      title: 'Willkommen bei Writora! 🎉',
+      description: 'Lass uns dein erstes KI-Buch erstellen',
+      component: <WelcomeStep />
+    },
+    {
+      id: 'book-idea',
+      title: 'Deine Buchidee',
+      description: 'Erzähl uns von deiner Idee',
+      component: <BookIdeaStep userData={userData} setUserData={setUserData} />
+    },
+    {
+      id: 'genre-selection',
+      title: 'Genre auswählen',
+      description: 'Welches Genre passt am besten?',
+      component: <GenreStep userData={userData} setUserData={setUserData} />
+    },
+    {
+      id: 'book-generation',
+      title: 'Buch wird erstellt...',
+      description: 'Die KI arbeitet an deinem Buch',
+      component: <GenerationStep userData={userData} />
+    },
+    {
+      id: 'wow-moment',
+      title: 'Dein erstes Buch ist fertig! 📚',
+      description: 'Schau dir dein Werk an',
+      component: <WowMomentStep userData={userData} />
+    }
   ];
 
-  const features = [
-    {
-      icon: <Sparkles className="h-8 w-8 text-blue-500" />,
-      title: 'KI-gestützte Erstellung',
-      description:
-        'Erstelle komplette Bücher durch natürliche Unterhaltung mit fortschrittlicher KI',
-    },
-    {
-      icon: <BookOpen className="h-8 w-8 text-green-500" />,
-      title: 'Live-Vorschau',
-      description: 'Sieh dein Buch in Echtzeit entstehen mit interaktiver Seitenvorschau',
-    },
-    {
-      icon: <Download className="h-8 w-8 text-purple-500" />,
-      title: 'KDP-Ready Export',
-      description: 'Exportiere direkt für Amazon KDP mit automatischem Cover und Metadaten',
-    },
-    {
-      icon: <Zap className="h-8 w-8 text-orange-500" />,
-      title: 'Schnelle Bearbeitung',
-      description: 'Ändere jede Seite durch einfache Chat-Befehle in Sekunden',
-    },
-  ];
-  
+  const progress = ((currentStep + 1) / steps.length) * 100;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
-      {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Writora
-            </span>
-          </div>
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Features
-            </Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Preise
-            </Link>
-            <Link href="#about" className="text-gray-600 hover:text-gray-900 transition-colors">
-              Über uns
-            </Link>
-          </nav>
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" asChild>
-              <Link href="/login">Anmelden</Link>
-            </Button>
-            <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <Link href="/register">Kostenlos starten</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="py-20 px-4">
-        <div className="container mx-auto text-center">
-          <Badge className="mb-6 bg-blue-100 text-blue-700 border-blue-200">
-            🚀 Neu: KI-gestützte Bucherstellung
-          </Badge>
-          <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent leading-tight">
-            Schreibe komplette Bücher<br />
-            durch einfache<br />
-            <span className="text-blue-600">Unterhaltung</span>
-          </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Writora ist die erste Plattform, die es ermöglicht, komplette Bücher durch natürliche 
-            Unterhaltung mit einer KI zu erstellen – von der ersten Idee bis zur fertigen KDP-Datei.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-lg px-8 py-4">
-              <Link href="/studio">
-                Jetzt kostenlos starten
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-4">
-              Live Demo ansehen
-            </Button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4">
+      <Card className="w-full max-w-2xl shadow-2xl border-0">
+        <CardHeader className="text-center pb-4">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <BookOpen className="h-8 w-8 text-blue-600" />
+            <span className="text-2xl font-bold text-gray-900">Writora</span>
           </div>
           
-          {/* Trust Indicators */}
-          <div className="flex items-center justify-center gap-8 text-sm text-gray-500 mb-16">
-            <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Kostenlos starten
-            </div>
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              1 Buch/Monat gratis
-            </div>
-            <div className="flex items-center gap-2">
-              <Zap className="h-4 w-4" />
-              Sofort loslegen
-            </div>
-          </div>
-
-          {/* Demo Preview */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 blur-3xl"></div>
-            <Card className="relative bg-white/90 backdrop-blur-sm border-0 shadow-2xl overflow-hidden">
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 border-b">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="ml-4 text-sm text-gray-600">Writora Studio</span>
-                </div>
-              </div>
-              <div className="grid md:grid-cols-2 min-h-[400px]">
-                <div className="p-6 border-r bg-white">
-                  <h4 className="font-semibold mb-4 text-gray-800">💬 KI-Chat</h4>
-                  <div className="space-y-4">
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <p className="text-sm text-blue-800">GPT: Willkommen bei Writora! Was möchtest du schreiben?</p>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg ml-6">
-                      <p className="text-sm text-gray-700">User: Ein Krimi mit einem dunklen Geheimnis.</p>
-                    </div>
-                    <div className="bg-blue-50 p-3 rounded-lg">
-                      <p className="text-sm text-blue-800">GPT: Super! Lieber nüchtern, dramatisch oder mysteriös?</p>
-                    </div>
-                    <div className="bg-gray-50 p-3 rounded-lg ml-6">
-                      <p className="text-sm text-gray-700">User: Mysteriös.</p>
-                    </div>
-                    <div className="bg-green-50 p-3 rounded-lg">
-                      <p className="text-sm text-green-800">✅ Ich generiere die Kapitelstruktur...</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="p-6 bg-slate-50">
-                  <h4 className="font-semibold mb-4 text-gray-800">📄 Live-Vorschau</h4>
-                  <div className="grid grid-cols-3 gap-2">
-                    {[1,2,3,4,5,6].map((page) => (
-                      <div key={page} className="aspect-[3/4] bg-white border rounded shadow-sm hover:shadow-md transition-all cursor-pointer p-2">
-                        <div className="text-xs text-gray-600 mb-1">Seite {page}</div>
-                        <div className="h-2 bg-gray-200 rounded mb-1"></div>
-                        <div className="h-1 bg-gray-100 rounded mb-1"></div>
-                        <div className="h-1 bg-gray-100 rounded"></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-white">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-gray-900">Warum Writora?</h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Die einfachste Art, professionelle Bücher zu erstellen
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {features.map((feature, index) => (
-              <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                <CardHeader className="text-center pb-4">
-                  <div className="mx-auto mb-4 p-3 bg-gray-50 rounded-full w-fit">
-                    {feature.icon}
-                  </div>
-                  <CardTitle className="text-lg">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center">
-                  <CardDescription className="text-gray-600">
-                    {feature.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Book Types */}
-          <div className="text-center mb-12">
-            <h3 className="text-3xl font-bold mb-4 text-gray-900">Unterstützte Buchtypen</h3>
-            <p className="text-gray-600 mb-8">Von Romanen bis Kinderbüchern – die KI passt sich automatisch an</p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {bookTypes.map((type, index) => (
-              <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:-translate-y-1 cursor-pointer">
-                <CardHeader className="text-center pb-3">
-                  <div className="text-3xl mb-2">{type.icon}</div>
-                  <CardTitle className="text-base">{type.name}</CardTitle>
-                </CardHeader>
-                <CardContent className="text-center pt-0">
-                  <CardDescription className="text-sm text-gray-600">
-                    {type.desc}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing Section */}
-      <section id="pricing" className="py-20 px-4 bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="container mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4 text-gray-900">Einfache, faire Preise</h2>
-            <p className="text-xl text-gray-600 mb-8">Starte kostenlos und upgrade nur wenn du mehr brauchst</p>
+          <Progress value={progress} className="mb-4" />
+          
+          <Badge className="bg-blue-100 text-blue-700 mb-2">
+            Schritt {currentStep + 1} von {steps.length}
+          </Badge>
+          
+          <CardTitle className="text-xl">{steps[currentStep].title}</CardTitle>
+          <p className="text-gray-600">{steps[currentStep].description}</p>
+        </CardHeader>
+        
+        <CardContent>
+          {steps[currentStep].component}
+          
+          <div className="flex justify-between mt-8">
+            <Button 
+              variant="outline" 
+              onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+              disabled={currentStep === 0}
+            >
+              Zurück
+            </Button>
             
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <span className={`${!isYearly ? 'text-gray-900 font-semibold' : 'text-gray-500'}`}>Monatlich</span>
-              <button 
-                onClick={() => setIsYearly(!isYearly)}
-                className="relative w-14 h-7 bg-gray-200 rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-              >
-                <div className={`absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full transition-transform duration-300 ${isYearly ? 'transform translate-x-7 bg-blue-600' : ''}`}></div>
-              </button>
-              <span className={`${isYearly ? 'text-gray-900 font-semibold' : 'text-gray-500'}`}>
-                Jährlich 
-                <Badge className="ml-2 bg-green-100 text-green-700 border-green-200">-20%</Badge>
-              </span>
-            </div>
+            <Button 
+              onClick={() => setCurrentStep(Math.min(steps.length - 1, currentStep + 1))}
+              className="bg-gradient-to-r from-blue-600 to-purple-600"
+              disabled={currentStep === steps.length - 1}
+            >
+              Weiter
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <Card className="border-2 hover:shadow-xl transition-all duration-300">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl mb-2">Free</CardTitle>
-                <div className="text-4xl font-bold mb-2">€0</div>
-                <CardDescription>Perfekt zum Ausprobieren</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>1 Buch pro Monat</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Alle Buchtypen</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>PDF Export</span>
-                </div>
-                <div className="flex items-center gap-3 text-gray-500">
-                  <span className="w-5 h-5 flex items-center justify-center">⚠️</span>
-                  <span>Mit Wasserzeichen</span>
-                </div>
-                <Button className="w-full mt-8" variant="outline">
-                  Kostenlos starten
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Pro Plan */}
-            <Card className="border-2 border-blue-500 relative hover:shadow-xl transition-all duration-300 scale-105">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-blue-600 text-white px-4 py-1">
-                  <Star className="h-3 w-3 mr-1" />
-                  Beliebt
-                </Badge>
-              </div>
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl mb-2">Pro</CardTitle>
-                <div className="text-4xl font-bold mb-2">
-                  €{isYearly ? '16' : '20'}
-                  <span className="text-lg font-normal text-gray-500">/Monat</span>
-                </div>
-                <CardDescription>Für ernsthafte Autoren</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Unbegrenzte Bücher</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Alle Buchtypen</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>KDP-Ready Export</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>KI-Cover Generator</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Kein Wasserzeichen</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Priority Support</span>
-                </div>
-                <Button className="w-full mt-8 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                  Pro werden
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Enterprise */}
-            <Card className="border-2 hover:shadow-xl transition-all duration-300">
-              <CardHeader className="text-center pb-8">
-                <CardTitle className="text-2xl mb-2">Enterprise</CardTitle>
-                <div className="text-4xl font-bold mb-2">Custom</div>
-                <CardDescription>Für Verlage & Teams</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Alles aus Pro</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Team-Management</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>API Zugang</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>White-Label Option</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <Check className="h-5 w-5 text-green-500" />
-                  <span>Dedicated Support</span>
-                </div>
-                <Button className="w-full mt-8" variant="outline">
-                  Kontakt aufnehmen
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-blue-600 to-purple-600">
-        <div className="container mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-4 text-white">Bereit für dein erstes KI-Buch?</h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Starte kostenlos und erlebe, wie einfach Bucherstellung sein kann
-          </p>
-          <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 text-lg px-8 py-4" asChild>
-            <Link href="/studio">
-              Jetzt kostenlos starten
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12 px-4">
-        <div className="container mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                  <BookOpen className="h-5 w-5 text-white" />
-                </div>
-                <span className="text-2xl font-bold">Writora</span>
-              </div>
-              <p className="text-gray-400 mb-4">
-                Die erste KI-gestützte Plattform für komplette Bucherstellung durch natürliche Unterhaltung.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Produkt</h4>
-              <div className="space-y-2 text-gray-400">
-                <Link href="/features" className="block hover:text-white transition-colors">Features</Link>
-                <Link href="/pricing" className="block hover:text-white transition-colors">Preise</Link>
-                <Link href="/demo" className="block hover:text-white transition-colors">Demo</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Unternehmen</h4>
-              <div className="space-y-2 text-gray-400">
-                <Link href="/about" className="block hover:text-white transition-colors">Über uns</Link>
-                <Link href="/blog" className="block hover:text-white transition-colors">Blog</Link>
-                <Link href="/careers" className="block hover:text-white transition-colors">Karriere</Link>
-              </div>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <div className="space-y-2 text-gray-400">
-                <Link href="/help" className="block hover:text-white transition-colors">Hilfe</Link>
-                <Link href="/contact" className="block hover:text-white transition-colors">Kontakt</Link>
-                <Link href="/privacy" className="block hover:text-white transition-colors">Datenschutz</Link>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-8 pt-8 flex flex-col md:flex-row items-center justify-between">
-            <p className="text-gray-400">© 2024 Writora. Alle Rechte vorbehalten.</p>
-            <div className="flex items-center space-x-4 mt-4 md:mt-0">
-              <span className="text-gray-400">Made in Germany 🇩🇪</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+        </CardContent>
+      </Card>
     </div>
   );
 }
+
+// 2. WOW-MOMENT COMPONENT (Trigger für Upgrade)
+function WowMomentStep({ userData }: { userData: any }) {
+  const [showUpgrade, setShowUpgrade] = useState(false);
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <div className="w-20 h-20 bg-gradient-to-br from-green-400 to-blue-500 rounded-full mx-auto mb-4 flex items-center justify-center">
+          <Sparkles className="h-10 w-10 text-white" />
+        </div>
+        
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          🎉 Dein "{userData.bookIdea}" ist fertig!
+        </h3>
+        
+        <p className="text-gray-600 mb-6">
+          8 Seiten, 2.400 Wörter, geschätzte Lesezeit: 12 Minuten
+        </p>
+
+        {/* Mini Book Preview */}
+        <div className="grid grid-cols-4 gap-2 max-w-md mx-auto mb-6">
+          {[1,2,3,4,5,6,7,8].map((page) => (
+            <div key={page} className="aspect-[3/4] bg-white border-2 border-gray-200 rounded shadow-sm p-1">
+              <div className="text-xs text-gray-500">S.{page}</div>
+              <div className="h-1 bg-gray-200 rounded mb-1"></div>
+              <div className="h-1 bg-gray-100 rounded"></div>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-4">
+          <Button className="w-full bg-gradient-to-r from-green-500 to-blue-600">
+            <BookOpen className="mr-2 h-4 w-4" />
+            Buch im Studio öffnen
+          </Button>
+          
+          <Button variant="outline" className="w-full" onClick={() => setShowUpgrade(true)}>
+            <Target className="mr-2 h-4 w-4" />
+            Mehr Bücher erstellen (Pro)
+          </Button>
+        </div>
+      </div>
+
+      {/* Upgrade Modal Trigger */}
+      {showUpgrade && (
+        <UpgradeModal onClose={() => setShowUpgrade(false)} />
+      )}
+    </div>
+  );
+}
+
+// 3. UPGRADE MODAL (Mit Stripe Embedded)
+function UpgradeModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle>Upgrade zu Pro</CardTitle>
+          <p className="text-gray-600">Erstelle unbegrenzt viele Bücher</p>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-gray-900">€19,99</div>
+                <div className="text-sm text-gray-600">pro Monat</div>
+              </div>
+            </div>
+
+            {/* Hier kommt Stripe Embedded Checkout */}
+            <StripeEmbeddedCheckout />
+            
+            <div className="text-center">
+              <Button variant="ghost" onClick={onClose}>
+                Später entscheiden
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// 4. STRIPE EMBEDDED CHECKOUT COMPONENT
+function StripeEmbeddedCheckout() {
+  // Stripe Embedded Checkout Integration
+  return (
+    <div className="stripe-embedded-checkout">
+      {/* Hier wird Stripe's Embedded Checkout geladen */}
+      <div id="stripe-checkout" className="min-h-[300px] flex items-center justify-center bg-gray-50 rounded-lg">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+          <p className="text-sm text-gray-600">Checkout wird geladen...</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 5. STRIPE INTEGRATION BACKEND
+// app/api/create-checkout-session/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { getServerSession } from 'next-auth';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2023-10-16',
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const session = await getServerSession();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { priceId } = await request.json();
+
+    // Erstelle Stripe Checkout Session
+    const checkoutSession = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card', 'sepa_debit', 'sofort'],
+      line_items: [
+        {
+          price: priceId, // price_1ProMonthly oder price_1ProYearly
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.NEXTAUTH_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXTAUTH_URL}/studio`,
+      customer_email: session.user.email!,
+      locale: 'de',
+      automatic_tax: {
+        enabled: true,
+      },
+      metadata: {
+        userId: session.user.id,
+      },
+    });
+
+    return NextResponse.json({ 
+      checkoutUrl: checkoutSession.url,
+      sessionId: checkoutSession.id 
+    });
+
+  } catch (error) {
+    console.error('Stripe error:', error);
+    return NextResponse.json(
+      { error: 'Error creating checkout session' },
+      { status: 500 }
+    );
+  }
+}
+
+// 6. STRIPE WEBHOOK HANDLER
+// app/api/stripe/webhook/route.ts
+import { NextRequest, NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { supabaseAdmin } from '@/lib/supabase-admin';
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+
+export async function POST(request: NextRequest) {
+  const body = await request.text();
+  const signature = request.headers.get('stripe-signature')!;
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+  } catch (err) {
+    return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
+  }
+
+  switch (event.type) {
+    case 'checkout.session.completed':
+      const session = event.data.object as Stripe.Checkout.Session;
+      
+      // Update user to Pro
+      await supabaseAdmin
+        .from('users')
+        .update({
+          role: 'pro',
+          subscription_status: 'active',
+          books_limit: -1, // Unlimited
+          stripe_customer_id: session.customer as string
+        })
+        .eq('id', session.metadata?.userId);
+      
+      break;
+
+    case 'invoice.payment_succeeded':
+      // Renew subscription
+      break;
+
+    case 'invoice.payment_failed':
+      // Handle failed payment
+      break;
+  }
+
+  return NextResponse.json({ received: true });
+}
+
+// 7. STRIPE PRODUCTS SETUP (In Stripe Dashboard)
+/*
+PRODUKTE ERSTELLEN:
+
+1. Writora Pro Monthly
+   - Preis: €19,99/Monat
+   - Recurring: monthly
+   - Price ID: price_1ProMonthly
+
+2. Writora Pro Yearly  
+   - Preis: €143,88/Jahr (40% Rabatt)
+   - Recurring: yearly
+   - Price ID: price_1ProYearly
+
+3. Writora Enterprise
+   - Preis: €149/Monat
+   - Recurring: monthly
+   - Price ID: price_1Enterprise
+*/
+
+// 8. ONBOARDING TRIGGER COMPONENTS
+function WelcomeStep() {
+  return (
+    <div className="text-center space-y-4">
+      <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full mx-auto flex items-center justify-center mb-6">
+        <Sparkles className="h-12 w-12 text-white" />
+      </div>
+      
+      <h3 className="text-xl font-semibold text-gray-900">
+        Bereit für dein erstes KI-Buch?
+      </h3>
+      
+      <p className="text-gray-600">
+        In den nächsten 3 Minuten erstellen wir gemeinsam dein erstes Buch. 
+        Komplett kostenlos, kein Haken!
+      </p>
+
+      <div className="grid grid-cols-3 gap-4 mt-6">
+        <div className="text-center">
+          <div className="text-2xl mb-2">💭</div>
+          <div className="text-sm text-gray-600">Idee teilen</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl mb-2">🤖</div>
+          <div className="text-sm text-gray-600">KI arbeitet</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl mb-2">📚</div>
+          <div className="text-sm text-gray-600">Buch fertig</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BookIdeaStep({ userData, setUserData }: any) {
+  return (
+    <div className="space-y-4">
+      <label className="block text-sm font-medium text-gray-700">
+        Worum soll dein Buch gehen?
+      </label>
+      <textarea
+        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        rows={4}
+        placeholder="Z.B. Ein spannender Krimi über einen verschwundenen Künstler in Paris..."
+        value={userData.bookIdea}
+        onChange={(e) => setUserData({...userData, bookIdea: e.target.value})}
+      />
+      <p className="text-sm text-gray-500">
+        💡 Tipp: Je detaillierter, desto besser wird dein Buch!
+      </p>
+    </div>
+  );
+}
+
+function GenreStep({ userData, setUserData }: any) {
+  const genres = [
+    { id: 'krimi', name: 'Krimi', icon: '🕵️', desc: 'Spannung & Ermittlung' },
+    { id: 'roman', name: 'Roman', icon: '📖', desc: 'Emotionen & Charaktere' },
+    { id: 'kinderbuch', name: 'Kinderbuch', icon: '👶', desc: 'Für junge Leser' },
+    { id: 'sachbuch', name: 'Sachbuch', icon: '📘', desc: 'Wissen & Tipps' }
+  ];
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-600">Wähle das passende Genre für deine Idee:</p>
+      
+      <div className="grid grid-cols-2 gap-3">
+        {genres.map((genre) => (
+          <button
+            key={genre.id}
+            onClick={() => setUserData({...userData, genre: genre.id})}
+            className={`p-4 border-2 rounded-lg text-left transition-all ${
+              userData.genre === genre.id
+                ? 'border-blue-500 bg-blue-50'
+                : 'border-gray-200 hover:border-gray-300'
+            }`}
+          >
+            <div className="text-2xl mb-2">{genre.icon}</div>
+            <div className="font-medium text-gray-900">{genre.name}</div>
+            <div className="text-sm text-gray-600">{genre.desc}</div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function GenerationStep({ userData }: any) {
+  return (
+    <div className="text-center space-y-6">
+      <div className="w-20 h-20 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto"></div>
+      
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          Die KI schreibt dein Buch...
+        </h3>
+        <p className="text-gray-600">
+          Basierend auf: "{userData.bookIdea}"
+        </p>
+      </div>
+
+      <div className="space-y-2 text-sm text-gray-600">
+        <div>✅ Genre-Struktur wird erstellt...</div>
+        <div>✅ Charaktere werden entwickelt...</div>
+        <div>⏳ Kapitel werden geschrieben...</div>
+        <div>⏳ Finale Überarbeitung...</div>
+      </div>
+    </div>
+  );
+}
+
+export { OnboardingFlow, WelcomeStep, BookIdeaStep, GenreStep, GenerationStep, WowMomentStep };
+export { OnboardingFlow, WelcomeStep, BookIdeaStep, GenreStep, GenerationStep, WowMomentStep };
