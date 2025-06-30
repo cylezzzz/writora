@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -85,8 +87,8 @@ export default function WritoraOnboarding() {
         setIsGenerating(false);
         setCurrentStep(currentStep + 1);
       }, 3000);
-    } else {
-      setCurrentStep(Math.min(steps.length - 1, currentStep + 1));
+    } else if (currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
     }
   };
 
