@@ -1,0 +1,2 @@
+// ✅ Hinweis: useEffect-Dependency ergänzen:
+// Beispiel: useEffect(() => { ... }, [tasks.length]);
