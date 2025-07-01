@@ -1,5 +1,4 @@
-Create: app/api/stripe/webhook/route.ts
-typescriptimport { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
@@ -31,4 +30,3 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({ received: true });
 }
-3. Fix app/page.tsx Export Issues
