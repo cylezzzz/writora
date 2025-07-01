@@ -7,4 +7,4 @@ export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     persistSession: false
   }
-})
+}
